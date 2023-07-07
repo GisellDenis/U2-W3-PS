@@ -1,6 +1,6 @@
 const cartTotPos = document.getElementById("cartTotPos");
 const URL = "https://striveschool-api.herokuapp.com/api/product/";
-const authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE3ZjRkNzEyYjUwYzAwMTQ5ZTUxZDAiLCJpYXQiOjE2ODg3Mjg3OTIsImV4cCI6MTY4OTkzODM5Mn0.0uiVkZutCMZfL1aZrzV9OuG_sgCf175unWshdi-AkT4"
+const authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE4MTQ2YjEyYjUwYzAwMTQ5ZTVkMWUiLCJpYXQiOjE2ODg3NjQ4NzgsImV4cCI6MTY4OTk3NDQ3OH0.JBuuT3GBmBRxv8bWyXoymCceMboYXMVObsioWwaeeBc"
     
 
 const addressBarContent = new URLSearchParams(location.search);

@@ -1,148 +1,129 @@
-const formReference = document.querySelector("form");
-const resetButton = document.querySelector("#confirmReset");
-const okButton = document.querySelector(".btn-primary");
-const nameInput = document.getElementById("nameProduct");
-const descriptionInput = document.getElementById("descriptionProduct");
-const brandInput = document.getElementById("brandProduct");
-const imgInput = document.getElementById("imgProduct");
-const priceInput = document.getElementById("priceProduct");
+const URL = 'https://striveschool-api.herokuapp.com/api/product/'
 
-const URL = "https://striveschool-api.herokuapp.com/api/product/";
-const authorization =
-"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE3ZjRkNzEyYjUwYzAwMTQ5ZTUxZDAiLCJpYXQiOjE2ODg3Mjg3OTIsImV4cCI6MTY4OTkzODM5Mn0.0uiVkZutCMZfL1aZrzV9OuG_sgCf175unWshdi-AkT4"
-const addressBarContent = new URLSearchParams(location.search);
-const eventId = addressBarContent.get("id");
+const addressBarContent = new URLSearchParams(location.search)
+const productId = addressBarContent.get('id')
 
-const alertPlaceholder = document.getElementById("liveAlertPlaceholder");
-const appendAlert = (message, type) => {
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = [
-    `<div class="alert alert-${type} alert-danger alert-dismissible" role="alert">`,
-    `   <div>${message}</div>`,
-    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-    "</div>",
-  ].join("");
+const nameInput = document.getElementById('product-name')
+const descriptionInput = document.getElementById('product-description')
+const priceInput = document.getElementById('product-price')
+const brandInput = document.getElementById('product-brand')
+const imageInput = document.getElementById('product-image')
 
-  alertPlaceholder.append(wrapper);
-};
-
-if (eventId) {
-  document.querySelector(".btn-primary").innerText = "Modifica prodotto";
-  document.querySelector("h1").innerText = "Modifica dettagli prodotto";
-  const deleteButton = document.querySelector(".btn-danger");
-  deleteButton.classList.remove("d-none");
-
-  fetch(URL + eventId, {
+if (productId) {
+  document.querySelector('h1').innerText = 'Attenzione ai dettagli'
+  document.querySelector('.btn-primary').innerText = 'Modifica prodotto'
+  fetch(URL + productId,{
     headers: {
-      Authorization: authorization,
-      "Content-Type": "application/json",
-    },
-  })
+      'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE3ZDdlYTEyYjUwYzAwMTQ5ZTUwMTUiLCJpYXQiOjE2ODg3MjEzODYsImV4cCI6MTY4OTkzMDk4Nn0.wD9j_StmK9JGlyGIyg-wg66HxoWVG2T7YdslCrslB3o"
+    }
+    }
+    )
     .then((res) => {
       if (res.ok) {
-        return res.json();
+        return res.json()
       } else {
-        if (res.status === 404) {
-          throw new Error("Not found");
-        } else if (res.status === 500) {
-          throw new Error("Internal Server Error");
-        } else {
-          throw new Error("Errore nel recupero dei dettagli dell'evento");
-        }
+        throw new Error("Errore nel recupero dei dettagli del prodotto")
       }
     })
     .then((detail) => {
-      nameInput.value = detail.name;
-      descriptionInput.value = detail.description;
-      brandInput.value = detail.brand;
-      imgInput.value = detail.imageUrl;
-      priceInput.value = detail.price;
+      console.log('DETAIL', detail)
+      nameInput.value = detail.name
+      descriptionInput.value = detail.description
+      priceInput.value = detail.price
+      brandInput.value = detail.brand
+      imageInput.value = detail.imageUrl
     })
-    .catch((err) => appendAlert(err));
+    .catch((err) => console.log(err))
+
+    let deleteButton = document.querySelector('.btn-danger')
+    deleteButton.classList.remove('d-none')
+    let resetForm = document.querySelector('.btn-secondary')
+    resetForm.classList.add('d-none')
+    deleteButton.addEventListener('click', function () {
+      let modalDel = document.querySelector('#exampleModal1 .btn-primary')
+      modalDel.addEventListener('click',function(){
+      fetch(URL + productId, {
+        method: 'DELETE',
+        headers: {
+        'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE3ZDdlYTEyYjUwYzAwMTQ5ZTUwMTUiLCJpYXQiOjE2ODg3MjEzODYsImV4cCI6MTY4OTkzMDk4Nn0.wD9j_StmK9JGlyGIyg-wg66HxoWVG2T7YdslCrslB3o"
+        }
+      })
+        .then((res) => {
+          if (res.ok) {
+            alert('PRODOTTO ELIMINATO!')
+            location.assign('home.html')
+          } else {
+            throw new Error("Problema nell'eliminazione del prodotto")
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      })
+    })
 }
 
-formReference.addEventListener("submit", (e) => {
-  e.preventDefault();
-});
-
-resetButton.addEventListener("click", () => {
-  nameInput.value = "";
-  descriptionInput.value = "";
-  brandInput.value = "";
-  imgInput.value = "";
-  priceInput.value = "";
-});
-
-okButton.addEventListener("click", (e) => {
-  e.preventDefault();
+const productForm = document.getElementById('product-form')
+productForm.addEventListener('submit', function (e) {
+  e.preventDefault()
 
   const newProduct = {
     name: nameInput.value,
     description: descriptionInput.value,
-    brand: brandInput.value,
-    imageUrl: imgInput.value,
     price: priceInput.value,
-  };
-
-  let urlToUse;
-  if (eventId) {
-    urlToUse = URL + "/" + eventId;
-  } else {
-    urlToUse = URL;
+    imageUrl: imageInput.value,
+    brand: brandInput.value
   }
 
-  let methodToUse;
-  if (eventId) {
-    methodToUse = "PUT";
+  console.log('ecco i valori recuperati dal form:', newProduct)
+
+  const URL = 'https://striveschool-api.herokuapp.com/api/product/'
+
+  let urlToUse
+  if (productId) {
+    urlToUse = URL +  productId
   } else {
-    methodToUse = "POST";
+    urlToUse = URL
+  }
+
+  let methodToUse
+  if (productId) {
+    methodToUse = 'PUT'
+  } else {
+    methodToUse = 'POST'
   }
 
   fetch(urlToUse, {
-    method: methodToUse,
+    method: methodToUse, 
     body: JSON.stringify(newProduct),
     headers: {
-      Authorization: authorization,
-      "Content-Type": "application/json",
+      'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NGE3ZDdlYTEyYjUwYzAwMTQ5ZTUwMTUiLCJpYXQiOjE2ODg3MjEzODYsImV4cCI6MTY4OTkzMDk4Nn0.wD9j_StmK9JGlyGIyg-wg66HxoWVG2T7YdslCrslB3o", 
+
+      'Content-Type': 'application/json',
     },
   })
     .then((res) => {
       if (res.ok) {
-        alert("EVENTO SALVATO!");
-        nameInput.value = "";
-        descriptionInput.value = "";
-        brandInput.value = "";
-        imgInput.value = "";
-        priceInput.value = "";
+        nameInput.value = ''
+        descriptionInput.value = ''
+        priceInput.value = ''
+        imageInput.value = ''
+        brandInput.value = ''
+        location.assign('home.html')
       } else {
-        throw new Error("Errore nel salvataggio dell'evento");
+        throw new Error("Errore nel salvataggio del prodotto")
       }
     })
     .catch((err) => {
-      appendAlert(err);
-    });
-});
-
-const confirmDelete = document.querySelector("#confirmDelete");
-
-const deletThisProduct = () => {
-  fetch(URL + eventId, {
-    method: "DELETE",
-    headers: {
-      Authorization: authorization,
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => {
-      if (res.ok) {
-        alert("EVENTO ELIMINATO!");
-        location.assign("index.html");
-      } else {
-        throw new Error("Problema nell'eliminazione dell'evento");
-      }
+      console.log(err)
     })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-confirmDelete.addEventListener("click", deletThisProduct);
+})
+
+const resetForm = document.querySelector('#exampleModal2 .btn-primary')
+resetForm.addEventListener('click', function(){
+        nameInput.value = ''
+        descriptionInput.value = ''
+        priceInput.value = ''
+        imageInput.value = ''
+        brandInput.value = ''
+})
